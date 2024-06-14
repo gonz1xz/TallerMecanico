@@ -17,6 +17,7 @@ describe('template spec', () => {
     cy.contains('Agenda').click()
     cy.contains('Gonzalinho')
     cy.get('.bi-trash3-fill').last().click()
+    cy.wait(1000)
     cy.contains('Gonzalinho').should('not.exist')
   })
 
@@ -36,4 +37,25 @@ describe('template spec', () => {
     cy.contains('Volver al menu').click()
   })
 
+  it('newPrice', () => {
+    cy.visit('https://tallermecanico-46u9.onrender.com/principal')
+    cy.contains('Ver lista de precios').should('have.text', 'Ver lista de precios')
+    cy.contains('Ver lista de precios').click()
+    cy.get('button').first().click()
+    cy.get('#budget-price').type('12500')
+    cy.get('#budget-description-job').type('Distribucion de Corsa')
+    cy.get('button[type="submit"]').click()
+    cy.wait(1000)
+    cy.contains('Distribucion de Corsa').should('exist')
+  })
+
+  it('deletePrice', () => {
+    cy.visit('https://tallermecanico-46u9.onrender.com/principal')
+    cy.contains('Ver lista de precios').should('have.text', 'Ver lista de precios')
+    cy.contains('Ver lista de precios').click()
+    cy.contains('Distribucion de Corsa')
+    cy.get('.bi-trash3-fill').last().click()
+    cy.wait(1000)
+    cy.contains('Distribucion de Corsa').should('not.exist')
+  })
 })
