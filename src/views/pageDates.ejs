@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+
+<body>
+    <h1 class="text-center mt-5">Agenda</h1>
+    <div class="container">
+        <div class="container d-flex justify-content-between">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalForm">
+                Agregar Cita
+            </button>
+
+    
+            <a type="button" class="btn btn-outline-primary" href="/">
+                Volver al menu
+            </a>
+        </div>
+
+        <div class="modal fade" id="modalForm" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Nueva cita</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="form-new-date" method="get">
+                            <div class="mb-3">
+                                <label for="client-name" class="col-form-label">Nombre Cliente:</label>
+                                <input type="text" class="form-control" id="client-name" placeholder="Ingrese nombre del cliente">
+                            </div>
+                            <div class="mb-3">
+                                <label for="model-car" class="col-form-label">Auto:</label>
+                                <input type="text" class="form-control" id="model-car" placeholder="Ingrese modelo del vehiculo">
+                            </div>
+                            <div class="mb-3">
+                                <label for="id-plate" class="col-form-label">Patente:</label>
+                                <input type="text" class="form-control" id="id-plate" placeholder="Ejemplo: AAA123 o AA111BB">
+                            </div>
+                            <div class="mb-3">
+                                <label for="description-job" class="col-form-label">Descripcion:</label>
+                                <textarea class="form-control" id="description-job" placeholder="Descripcion del trabajo a realizar...."></textarea>
+                            </div>
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Confirmar Cita</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="list-group mt-4 gap-2">
+            <% dates.forEach(date => { %>
+                <a class="list-group-item list-group-item-action" aria-current="true">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1"><%=date.clientName%></h5>
+                        <div>
+                            <button class="btn" class="delete-button" onclick="deleteCite('<%= date.id %>')"><i class="bi-trash3-fill"></i></button>
+                            <button class="btn" data-bs-toggle="modal" data-bs-target="#editDateModal-<%= date.id %>"><i class="bi bi-pencil-square"></i></button>
+                            <button class="btn" id="check" onclick="checkCite('<%= date.id %>')"><i class="bi bi-check-square-fill"></i></button>
+                        </div>
+                    </div>
+                    <div class="d-flex w-100 justify-content-between">
+                        <p>AUTO: <%=date.car%></p>
+                        <p>PATENTE: <%=date.idPlate%></p>
+                        <p>FECHA: <%=date.datatime%></p>
+                        <p><% if (date.done) { %>FINALIZADO<% } else { %>ACTIVO<% } %></p>
+                    </div>
+                    <p class="mb-1">DESCRIPCION: <%=date.descriptionJob%></p>
+                </a>
+
+                <div class="modal fade" id="editDateModal-<%= date.id %>" tabindex="-1" aria-labelledby="editDateModalLabel-<%= date.id %>" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editDateModalLabel-<%= date.id %>">Editar Cita</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="edit-date-form-<%= date.id %>">
+                                    <div class="mb-3">
+                                        <label for="edit-client-name-<%= date.id %>" class="col-form-label">Nombre Cliente:</label>
+                                        <input type="text" class="form-control" id="edit-client-name-<%= date.id %>" value="<%= date.clientName %>">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="edit-car-<%= date.id %>" class="col-form-label">Auto:</label>
+                                        <input type="text" class="form-control" id="edit-car-<%= date.id %>" value="<%= date.car %>">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="edit-id-plate-<%= date.id %>" class="col-form-label">Patente:</label>
+                                        <input type="text" class="form-control" id="edit-id-plate-<%= date.id %>" value="<%= date.idPlate %>">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="edit-description-job-<%= date.id %>" class="col-form-label">Descripcion:</label>
+                                        <textarea class="form-control" id="edit-description-job-<%= date.id %>"><%= date.descriptionJob %></textarea>
+                                    </div>
+                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-primary" onclick="updateCite('<%= date.id %>')">Guardar Cambios</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const form = document.getElementById('form-new-date');
+        
+        function deleteCite(id) {
+            axios.delete(`/dates/${id}`)
+                .then((response) => {
+                    console.log('Delete cite..');
+                    alert("Cita Eliminada");
+                    window.location.reload();
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        }
+
+        function updateCite(id) {
+            const clientName = document.getElementById(`edit-client-name-${id}`).value;
+            const car = document.getElementById(`edit-car-${id}`).value;
+            const idPlate = document.getElementById(`edit-id-plate-${id}`).value;
+            const descriptionJob = document.getElementById(`edit-description-job-${id}`).value;
+
+            if (clientName === '' || car === '' || idPlate === '' || descriptionJob === '') {
+                alert("Complete todos los campos porfavor!");
+            } else {
+                axios.put(`/dates/${id}`, { clientName, car, idPlate, descriptionJob })
+                .then((response) => {
+                    console.log('Update cite..');
+                    window.location.reload();
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+            }
+        }
+
+        function checkCite(id) {
+            axios.put(`/dates/check/${id}`)
+                .then((response) => {
+                    console.log('Check cite..');
+                    window.location.reload();
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const clientName = document.getElementById('client-name').value;
+            const car = document.getElementById('model-car').value;
+            const idPlate = document.getElementById('id-plate').value;
+            const descriptionJob = document.getElementById('description-job').value;
+
+            if (clientName === '' || car === '' || idPlate === '' || descriptionJob === '') {
+                alert("Complete todos los campos porfavor!");
+            } else {
+                axios.post('/dates', { clientName, car, idPlate, descriptionJob })
+                    .then((response) => {
+                        console.log('Creating cites...');
+                        window.location.reload();
+                        form.reset();
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+            }
+        });
+    </script>
+
+</body>
+
+</html>

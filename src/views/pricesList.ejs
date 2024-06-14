@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de precios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Lista de precios</h1>
+        <h2 class="text-center">Mano de Obra</h2>
+
+        <div class="container d-flex justify-content-between">
+            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalForm">
+                Agregar presupuesto
+            </button>
+
+    
+            <a type="button" class="btn btn-outline-secondary" href="/">
+                Volver al menu
+            </a>
+        </div>
+
+        <div class="modal fade" id="modalForm" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Nuevo presuesto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="form-new-price" method="get">
+                            <div class="mb-3">
+                                <label for="budget-price" class="col-form-label">Precio</label>
+                                <input type="number" class="form-control" id="budget-price" placeholder="Ingrese precio del trabajo">
+                            </div>
+                            <div class="mb-3">
+                                <label for="budget-description-job" class="col-form-label">Descripcion:</label>
+                                <textarea class="form-control" id="budget-description-job" placeholder="Descripcion del trabajo"></textarea>
+                            </div>
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Agregar Presupuesto</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Descripcion</th>
+                    <th scope="col">Valor</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (prices.length > 0) { %>
+                    <% prices.forEach(dataPrice => { %>
+                        <tr>
+                            <th><%= dataPrice.descriptionJob %></th>
+                            <th>$<%= dataPrice.price %></th>
+                            <th><button class="btn" onclick="deleteBudget('<%= dataPrice.id %>')"><i class="bi-trash3-fill"></i></button></th>
+                            <th><button class="btn" data-bs-toggle="modal" data-bs-target="#editPriceModal-<%= dataPrice.id %>"><i class="bi bi-pencil-square"></i></button></th>
+                        </tr>
+
+                        <div class="modal fade" id="editPriceModal-<%= dataPrice.id %>" tabindex="-1" aria-labelledby="editPriceModalLabel-<%= dataPrice.id %>" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editPriceModalLabel-<%= dataPrice.id %>">Editar presuesto</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="edit-dataPrice-form-<%= dataPrice.id %>">
+                                            <div class="mb-3">
+                                                <label for="edit-client-name-<%= dataPrice.id %>" class="col-form-label">Valor:</label>
+                                                <input type="text" class="form-control" id="edit-price-<%= dataPrice.id %>" value="<%= dataPrice.price %>">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="edit-description-job-<%= dataPrice.id %>" class="col-form-label">Descripcion:</label>
+                                                <textarea class="form-control" id="edit-description-job-<%= dataPrice.id %>"><%= dataPrice.descriptionJob %></textarea>
+                                            </div>
+                                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="button" class="btn btn-primary" onclick="updateBudget('<%= dataPrice.id %>')">Guardar Cambios</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="4">No hay presupuestos</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const form = document.getElementById('form-new-price');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const price = document.getElementById('budget-price').value;
+            const descriptionJob = document.getElementById('budget-description-job').value;
+
+            if (price == '' || descriptionJob == '') {
+                alert("Complete todos los campos porfavor!");
+            } else {
+                axios.post('/prices', { price, descriptionJob })
+                    .then((response) => {
+                        console.log('Creating budget...');
+                        window.location.reload();
+                        form.reset();
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+            }
+        });
+
+        function deleteBudget(id) {
+            console.log(id)
+            axios.delete(`/prices/${id}`)
+                .then((response) => {
+                    console.log('Delete cite..');
+                    window.location.reload();
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        }
+
+        function updateBudget(id) {
+            const price = document.getElementById(`edit-price-${id}`).value;
+            const descriptionJob = document.getElementById(`edit-description-job-${id}`).value;
+
+            console.log(price, descriptionJob)
+
+
+            if (price == '' || descriptionJob == '' || price <= 0) {
+                alert("Complete todos los campos correctamente porfavor!");
+            } else {
+                axios.put(`/prices/${id}`, { price, descriptionJob })
+                .then((response) => {
+                    console.log('Update cite..');
+                    window.location.reload();
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
